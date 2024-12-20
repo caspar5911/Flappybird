@@ -14,6 +14,15 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const screenHeight = window.innerHeight; // Dynamic screen height
 
+  // Reset game function
+  const resetGame = () => {
+    setBirdY(250); // Reset bird position
+    setGravity(2); // Reset gravity
+    setPipes([{ x: 200, gap: 300 }]); // Reset pipes
+    setScore(0); // Reset score
+    setGameOver(false); // Reset game over status
+  };
+
   // Move pipes and apply gravity
   useEffect(() => {
     if (gameOver) return;
@@ -53,7 +62,7 @@ const Game = () => {
 
   const handleJump = () => {
     if (gameOver) return;
-    setGravity(-4); // Jump the bird
+    setGravity(-8); // Jump the bird
     setTimeout(() => setGravity(2), 200); // Reset gravity after jump
   };
 
@@ -88,17 +97,37 @@ const Game = () => {
         Score: {score}
       </div>
       {gameOver && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '32px',
-            color: 'white',
-          }}
-        >
-          Game Over
+        <div>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '32px',
+              color: 'white',
+            }}
+          >
+            Game Over
+          </div>
+          <button
+            onClick={resetGame}
+            style={{
+              position: 'absolute',
+              top: '60%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '24px',
+              padding: '10px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
         </div>
       )}
     </div>

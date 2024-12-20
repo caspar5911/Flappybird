@@ -1,4 +1,5 @@
 import React from 'react';
+import birdImage from '../assets/bird.png'; // Import the image
 
 const Bird = ({ yPosition }) => {
   return (
@@ -10,6 +11,8 @@ const Bird = ({ yPosition }) => {
         width: '40px',
         height: '40px',
         backgroundColor: 'yellow',
+        backgroundImage: `url(${birdImage})`, // Use the imported image as background
+        backgroundSize: 'cover', // Ensure the image covers the entire div
         borderRadius: '50%',
       }}
     />
