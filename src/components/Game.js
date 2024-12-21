@@ -1,79 +1,117 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Bird from './Bird';
 import Pipe from './Pipe';
-import { checkCollision } from '../utils/gameUtils'; // Import collision detection helper
+import { checkCollision } from '../utils/gameUtils';
 
 const Game = () => {
-  const [birdY, setBirdY] = useState(250); // Vertical position of the bird
-  const [birdX] = useState(50); // Horizontal position of the bird (constant)
-  const [birdHeight] = useState(40); // Height of the bird
-  const [birdWidth] = useState(40); // Width of the bird
-  const [gravity, setGravity] = useState(2); // Gravity effect
-  const [pipes, setPipes] = useState([{ x: 200, gap: 300 }]); // Initial pipe
+  const [birdY, setBirdY] = useState(250);
+  const [birdX] = useState(50);
+  const [gravity, setGravity] = useState(6);
   const [score, setScore] = useState(0);
+  const [topScore, setTopScore] = useState(parseInt(localStorage.getItem('topScore')) || 0);
   const [gameOver, setGameOver] = useState(false);
-  const screenHeight = window.innerHeight; // Dynamic screen height
+  const [gameStarted, setGameStarted] = useState(false);
+  const [countdown, setCountdown] = useState(null); // Countdown state
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight);
 
-  // Reset game function
+  const fixedHorizontalGap = 500;
+  const fixedVerticalGap = 300;
+  const pipeWidth = 40;
+
+  const pipesRef = useRef([
+    { x: 400, gapPosition: Math.random() * (screenHeight - fixedVerticalGap), passed: false },
+  ]);
+
   const resetGame = () => {
-    setBirdY(250); // Reset bird position
-    setGravity(2); // Reset gravity
-    setPipes([{ x: 200, gap: 300 }]); // Reset pipes
-    setScore(0); // Reset score
-    setGameOver(false); // Reset game over status
+    setScreenWidth(window.innerWidth);
+    setScreenHeight(window.innerHeight);
+    setBirdY(250);
+    setGravity(6);
+    pipesRef.current = [
+      { x: 400, gapPosition: Math.random() * (screenHeight - fixedVerticalGap), passed: false },
+    ];
+    setScore(0);
+    startCountdown();
+    setGameOver(false);
   };
 
-  // Move pipes and apply gravity
+  const startCountdown = () => {
+    setGameStarted(false);
+    let count = 3;
+    setCountdown(count);
+    const countdownInterval = setInterval(() => {
+      count -= 1;
+      if (count === 0) {
+        clearInterval(countdownInterval);
+        setCountdown('Start!');
+        setTimeout(() => {
+          setCountdown(null);
+          setGameStarted(true);
+        }, 1000);
+      } else {
+        setCountdown(count);
+      }
+    }, 1000);
+  };
+
+  const startGame = () => {
+    setScreenWidth(window.innerWidth);
+    setScreenHeight(window.innerHeight);
+    startCountdown();
+  };
+
   useEffect(() => {
-    if (gameOver) return;
+    if (gameOver || !gameStarted) return;
 
     const gameInterval = setInterval(() => {
-      setBirdY((prevY) => prevY + gravity); // Apply gravity to bird
+      setBirdY((prevY) => prevY + gravity);
 
-      // Move pipes leftward and check for new pipe generation
-      setPipes((prevPipes) => {
-        const updatedPipes = prevPipes.map((pipe) => ({
-          ...pipe,
-          x: pipe.x - 2, // Move pipes left
-        }));
+      pipesRef.current = pipesRef.current.map((pipe) => ({
+        ...pipe,
+        x: pipe.x - 4,
+      }));
 
-        // Add new pipe
-        if (updatedPipes[updatedPipes.length - 1].x < 150) {
-          updatedPipes.push({ x: 400, gap: Math.random() * 200 + 100 });
-        }
-
-        // Remove off-screen pipes
-        return updatedPipes.filter((pipe) => pipe.x > 0);
-      });
-
-      // Check for collisions
-      if (checkCollision(birdX, birdY, birdWidth, birdHeight, pipes, screenHeight)) {
-        setGameOver(true); // End game on collision
+      if (pipesRef.current[pipesRef.current.length - 1].x < screenWidth - fixedHorizontalGap) {
+        const newPipeX = pipesRef.current[pipesRef.current.length - 1].x + fixedHorizontalGap;
+        pipesRef.current.push({
+          x: newPipeX,
+          gapPosition: Math.random() * (screenHeight - fixedVerticalGap),
+          passed: false,
+        });
       }
 
-      // Increment score for every pipe passed
-      setScore((prevScore) => {
-        return pipes.some((pipe) => pipe.x < 50) ? prevScore + 1 : prevScore;
+      pipesRef.current = pipesRef.current.filter((pipe) => pipe.x + pipeWidth > 0);
+
+      if (checkCollision(birdX, birdY, pipeWidth, 40, pipesRef.current, screenHeight)) {
+        setGameOver(true);
+      }
+
+      pipesRef.current.forEach((pipe) => {
+        if (!pipe.passed && pipe.x + pipeWidth < birdX) {
+          pipe.passed = true;
+          setScore((prevScore) => prevScore + 1);
+        }
       });
+
+      if (score > topScore) {
+        setTopScore(score);
+        localStorage.setItem('topScore', score);
+      }
     }, 20);
 
-    return () => clearInterval(gameInterval); // Clean up interval on component unmount
-  }, [birdY, gravity, pipes, gameOver, birdX, birdWidth, birdHeight, screenHeight]);
+    return () => clearInterval(gameInterval);
+  }, [birdY, gravity, gameOver, birdX, gameStarted, score, topScore, screenHeight, screenWidth]);
 
-  // Define handleJump inside useCallback
   const handleKeyDown = useCallback(
     (e) => {
-      if (e.key === ' ') { // Spacebar for jump
-        const handleJump = () => {
-          if (gameOver) return;
-          setGravity(-8); // Jump the bird
-          setTimeout(() => setGravity(2), 200); // Reset gravity after jump
-        };
-
-        handleJump();
+      if (e.key === ' ') {
+        if (gameOver || !gameStarted) return;
+        setGravity(-8);
+        setTimeout(() => setGravity(6), 300);
       }
     },
-    [gameOver] // Only depend on gameOver
+    [gameOver, gameStarted]
   );
 
   useEffect(() => {
@@ -81,27 +119,46 @@ const Game = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown]); // Include handleKeyDown in dependencies
+  }, [handleKeyDown]);
 
   return (
     <div
       style={{
-        width: '100vw',
-        height: `${screenHeight}px`,
-        backgroundColor: 'skyblue',
-        position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #b0e0e6 0%, #e6e6fa 100%)',
         overflow: 'hidden',
       }}
     >
-      <Bird yPosition={birdY} />
-      {pipes.map((pipe, index) => (
-        <Pipe key={index} xPosition={pipe.x} gap={pipe.gap} />
-      ))}
-      <div style={{ position: 'absolute', top: '20px', left: '20px', color: 'white', fontSize: '24px' }}>
-        Score: {score}
-      </div>
-      {gameOver && (
-        <div>
+      <div
+        style={{
+          width: `${screenWidth}px`,
+          height: `${screenHeight}px`,
+          backgroundColor: 'rgba(240, 255, 240, 0.8)',
+          borderRadius: '20px',
+          boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.3)',
+          position: 'relative',
+        }}
+      >
+        {countdown && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '48px',
+              fontWeight: 'bold',
+              color: 'black',
+            }}
+          >
+            {countdown}
+          </div>
+        )}
+
+        {!gameStarted && !gameOver && !countdown && (
           <div
             style={{
               position: 'absolute',
@@ -112,28 +169,81 @@ const Game = () => {
               color: 'white',
             }}
           >
-            Game Over
+            <button
+              onClick={startGame}
+              style={{
+                fontSize: '24px',
+                padding: '10px',
+                backgroundColor: '#4CAF50',
+                color: 'black',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+              }}
+            >
+              Start Game
+            </button>
           </div>
-          <button
-            onClick={resetGame}
-            style={{
-              position: 'absolute',
-              top: '60%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: '24px',
-              padding: '10px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            Try Again
-          </button>
+        )}
+
+        <Bird yPosition={birdY} />
+        {pipesRef.current.map((pipe, index) => (
+          <Pipe
+            key={index}
+            xPosition={pipe.x}
+            gapPosition={pipe.gapPosition}
+            screenHeight={screenHeight}
+            screenWidth={screenWidth}
+            gapSize={fixedVerticalGap}
+          />
+        ))}
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            color: 'black',
+            fontSize: '24px',
+          }}
+        >
+          Score: {score} | Top Score: {topScore}
         </div>
-      )}
+
+        {gameOver && (
+          <div>
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                fontSize: '32px',
+                color: 'black',
+              }}
+            >
+              Game Over
+            </div>
+            <button
+              onClick={resetGame}
+              style={{
+                position: 'absolute',
+                top: '60%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontSize: '24px',
+                padding: '10px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
