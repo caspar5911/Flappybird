@@ -5,7 +5,7 @@ export const checkCollision = (birdX, birdY, birdWidth, birdHeight, pipes, scree
     // Pipe hitbox for top and bottom pipes
     const topPipeX = pipe.x;
     // const topPipeY = 0;
-    const topPipeWidth = 100; // Pipe width (same for both pipes)
+    const topPipeWidth = 80; // Pipe width (same for both pipes)
     const topPipeHeight = pipe.gapPosition;
     
     const bottomPipeX = pipe.x;
