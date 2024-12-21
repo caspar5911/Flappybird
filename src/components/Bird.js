@@ -2,14 +2,14 @@ import React from 'react';
 import birdImage from '../assets/bird.png'; // Import the image
 
 const Bird = ({ yPosition, screenHeight }) => {
-  const birdHeight = 50; // Increased bird height
-  const birdWidth = 50; // Increased bird width
+  const birdHeight = 40; // Increased bird height
+  const birdWidth = 40; // Increased bird width
 
   return (
     <div
       style={{
         position: 'absolute',
-        left: '50px', // Fixed horizontal position
+        left: '40px', // Fixed horizontal position
         top: `${yPosition}px`, // Dynamic vertical position
         width: `${birdWidth}px`, // Adjusted width
         height: `${birdHeight}px`, // Adjusted height
