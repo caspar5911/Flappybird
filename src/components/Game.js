@@ -60,20 +60,20 @@ const Game = () => {
     return () => clearInterval(gameInterval); // Clean up interval on component unmount
   }, [birdY, gravity, pipes, gameOver, birdX, birdWidth, birdHeight, screenHeight]);
 
-  const handleJump = () => {
-    if (gameOver) return;
-    setGravity(-8); // Jump the bird
-    setTimeout(() => setGravity(2), 200); // Reset gravity after jump
-  };
-
-  // Use useCallback to memoize handleKeyDown
+  // Define handleJump inside useCallback
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === ' ') { // Spacebar for jump
+        const handleJump = () => {
+          if (gameOver) return;
+          setGravity(-8); // Jump the bird
+          setTimeout(() => setGravity(2), 200); // Reset gravity after jump
+        };
+
         handleJump();
       }
     },
-    [handleJump, gameOver] // Dependencies of handleKeyDown
+    [gameOver] // Only depend on gameOver
   );
 
   useEffect(() => {
