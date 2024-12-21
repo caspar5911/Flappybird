@@ -14,6 +14,7 @@ const Game = () => {
   const [countdown, setCountdown] = useState(null); // Countdown state
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [screenHeight, setScreenHeight] = useState(window.innerHeight);
+  const timeoutRef = useRef(null); // Ref to store the timeout ID
 
   const fixedHorizontalGap = 400;
   const fixedVerticalGap = 300;
@@ -105,8 +106,19 @@ const Game = () => {
 
   const handleAction = useCallback(() => {
     if (gameOver || !gameStarted) return;
+  
+    // Clear the existing timeout if any
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  
+    // Set gravity to -8 for the jump
     setGravity(-8);
-    setTimeout(() => setGravity(6), 300);
+  
+    // Start a new timeout and store its ID in the ref
+    timeoutRef.current = setTimeout(() => {
+      setGravity(6); // Reset gravity after 300ms
+    }, 300);
   }, [gameOver, gameStarted]);
 
   useEffect(() => {
