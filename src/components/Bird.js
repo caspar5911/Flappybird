@@ -1,15 +1,18 @@
 import React from 'react';
 import birdImage from '../assets/bird.png'; // Import the image
 
-const Bird = ({ yPosition }) => {
+const Bird = ({ yPosition, screenHeight }) => {
+  const birdHeight = 50; // Increased bird height
+  const birdWidth = 50; // Increased bird width
+
   return (
     <div
       style={{
         position: 'absolute',
-        left: '50px',
-        top: `${yPosition}px`, // Control the bird's vertical position
-        width: '40px',
-        height: '40px',
+        left: '50px', // Fixed horizontal position
+        top: `${yPosition}px`, // Dynamic vertical position
+        width: `${birdWidth}px`, // Adjusted width
+        height: `${birdHeight}px`, // Adjusted height
         backgroundColor: 'yellow',
         backgroundImage: `url(${birdImage})`, // Use the imported image as background
         backgroundSize: 'cover', // Ensure the image covers the entire div
