@@ -103,26 +103,27 @@ const Game = () => {
     return () => clearInterval(gameInterval);
   }, [birdY, gravity, gameOver, birdX, gameStarted, score, topScore, screenHeight, screenWidth]);
 
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === ' ') {
-        if (gameOver || !gameStarted) return;
-        setGravity(-8);
-        setTimeout(() => setGravity(6), 300);
-      }
-    },
-    [gameOver, gameStarted]
-  );
+  const handleAction = useCallback(() => {
+    if (gameOver || !gameStarted) return;
+    setGravity(-8);
+    setTimeout(() => setGravity(6), 300);
+  }, [gameOver, gameStarted]);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === ' ') handleAction();
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown]);
+  }, [handleAction]);
 
   return (
     <div
+      onTouchStart={handleAction} // Handle touch events for mobile
+      onClick={handleAction} // Handle mouse clicks
       style={{
         display: 'flex',
         justifyContent: 'center',
