@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Bird from './Bird';
 import Pipe from './Pipe';
 import { checkCollision } from '../utils/gameUtils'; // Import collision detection helper
@@ -60,24 +60,28 @@ const Game = () => {
     return () => clearInterval(gameInterval); // Clean up interval on component unmount
   }, [birdY, gravity, pipes, gameOver, birdX, birdWidth, birdHeight, screenHeight]);
 
-  const handleJump = () => {
-    if (gameOver) return;
-    setGravity(-8); // Jump the bird
-    setTimeout(() => setGravity(2), 200); // Reset gravity after jump
-  };
+  // Define handleJump inside useCallback
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === ' ') { // Spacebar for jump
+        const handleJump = () => {
+          if (gameOver) return;
+          setGravity(-8); // Jump the bird
+          setTimeout(() => setGravity(2), 200); // Reset gravity after jump
+        };
 
-  const handleKeyDown = (e) => {
-    if (e.key === ' ') { // Spacebar for jump
-      handleJump();
-    }
-  };
+        handleJump();
+      }
+    },
+    [gameOver] // Only depend on gameOver
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]); // Include handleKeyDown in dependencies
 
   return (
     <div
