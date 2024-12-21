@@ -1,0 +1,43 @@
+name: React CI/CD
+
+on:
+  push:
+    branches:
+      - main # Run workflow on pushes to the main branch
+  pull_request:
+    branches:
+      - main # Run workflow on pull requests targeting the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Setup Node.js environment
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18 # Use the Node.js version you prefer
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Step 4: Run tests (optional; skip if no tests yet)
+    - name: Run tests
+      run: npm test -- --watchAll=false
+
+    # Step 5: Build the project
+    - name: Build the project
+      run: npm run build
+
+    # Step 6: Deploy to GitHub Pages (optional deployment target)
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build
