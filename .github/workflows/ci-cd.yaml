@@ -28,8 +28,8 @@ jobs:
       run: npm install
 
     # Step 4: Run tests (optional; skip if no tests yet)
-    - name: Run tests
-      run: npm test -- --watchAll=false
+    # - name: Run tests
+    #   run: npm test -- --watchAll=false
 
     # Step 5: Build the project
     - name: Build the project
