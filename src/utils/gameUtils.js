@@ -10,7 +10,7 @@ export const checkCollision = (birdX, birdY, birdWidth, birdHeight, pipes, scree
     
     const bottomPipeX = pipe.x;
     const bottomPipeY = pipe.gapPosition + 200; // Fixed gap
-    const bottomPipeWidth = 800; // Pipe width (same for both pipes)
+    const bottomPipeWidth = 80; // Pipe width (same for both pipes)
     // const bottomPipeHeight = screenHeight - pipe.gapPosition - 200; // Bottom pipe height
 
     // Check if the bird is colliding with the top pipe
