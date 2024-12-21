@@ -118,7 +118,7 @@ const Game = () => {
     // Start a new timeout and store its ID in the ref
     timeoutRef.current = setTimeout(() => {
       setGravity(6); // Reset gravity after 300ms
-    }, 300);
+    }, 200);
   }, [gameOver, gameStarted]);
 
   useEffect(() => {
