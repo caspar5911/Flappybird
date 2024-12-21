@@ -6,7 +6,7 @@ import { checkCollision } from '../utils/gameUtils';
 const Game = () => {
   const [birdY, setBirdY] = useState(250);
   const [birdX] = useState(50);
-  const [gravity, setGravity] = useState(6);
+  const [gravity, setGravity] = useState(10);
   const [score, setScore] = useState(0);
   const [topScore, setTopScore] = useState(parseInt(localStorage.getItem('topScore')) || 0);
   const [gameOver, setGameOver] = useState(false);
@@ -28,7 +28,7 @@ const Game = () => {
     setScreenWidth(window.innerWidth);
     setScreenHeight(window.innerHeight);
     setBirdY(250);
-    setGravity(6);
+    setGravity(10);
     pipesRef.current = [
       { x: 400, gapPosition: Math.random() * (screenHeight - fixedVerticalGap), passed: false },
     ];
@@ -70,7 +70,7 @@ const Game = () => {
 
       pipesRef.current = pipesRef.current.map((pipe) => ({
         ...pipe,
-        x: pipe.x - 4,
+        x: pipe.x - 6,
       }));
 
       if (pipesRef.current[pipesRef.current.length - 1].x < screenWidth - fixedHorizontalGap) {
@@ -117,7 +117,7 @@ const Game = () => {
   
     // Start a new timeout and store its ID in the ref
     timeoutRef.current = setTimeout(() => {
-      setGravity(6); // Reset gravity after 300ms
+      setGravity(10); // Reset gravity after 300ms
     }, 200);
   }, [gameOver, gameStarted]);
 
