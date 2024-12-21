@@ -15,9 +15,9 @@ const Game = () => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [screenHeight, setScreenHeight] = useState(window.innerHeight);
 
-  const fixedHorizontalGap = 500;
+  const fixedHorizontalGap = 400;
   const fixedVerticalGap = 300;
-  const pipeWidth = 40;
+  const pipeWidth = 80;
 
   const pipesRef = useRef([
     { x: 400, gapPosition: Math.random() * (screenHeight - fixedVerticalGap), passed: false },
