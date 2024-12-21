@@ -83,7 +83,7 @@ const Game = () => {
 
       pipesRef.current = pipesRef.current.filter((pipe) => pipe.x + pipeWidth > 0);
 
-      if (checkCollision(birdX, birdY, pipeWidth, 40, pipesRef.current, screenHeight)) {
+      if (checkCollision(birdX, birdY, 30, 30, pipesRef.current, screenHeight)) {
         setGameOver(true);
       }
 
